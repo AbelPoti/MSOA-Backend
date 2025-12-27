@@ -31,16 +31,8 @@ public interface ListingRepository extends JpaRepository<Listing, Long>, JpaSpec
             }
 
             // Filter by location
-            if (filterCriteria.getCountryName() != null) {
-                predicates.add(cb.equal(root.get("city").get("county").get("country").get("name"),
-                        filterCriteria.getCountryName()));
-                if (filterCriteria.getCountyName() != null) {
-                    predicates.add(cb.equal(root.get("city").get("county").get("name"), filterCriteria.getCountyName()));
-                    if (filterCriteria.getCityName() != null) {
-                        predicates.add(cb.equal(root.get("city").get("name"), filterCriteria.getCityName()));
-                    }
-                }
-            }
+            predicates.add(buildLocationPredicate(root, cb, filterCriteria.getCountryName(),
+                    filterCriteria.getCountyName(), filterCriteria.getCityName()));
 
             // Filter by category
             if (filterCriteria.getCategoryName() != null) {
@@ -51,6 +43,29 @@ public interface ListingRepository extends JpaRepository<Listing, Long>, JpaSpec
 
             return cb.and(predicates.toArray(new Predicate[0]));
         });
+    }
+
+    private Predicate buildLocationPredicate(Path<Listing> root, CriteriaBuilder cb, String countryName,
+                                             String countyName, String cityName) {
+        List<Predicate> locationPredicates = new ArrayList<>();
+
+        boolean filterByCountry = countryName != null;
+        boolean filterByCounty = filterByCountry && countyName != null;
+        boolean filterByCity = filterByCounty && cityName != null;
+
+        if (filterByCountry) {
+            locationPredicates.add(cb.equal(root.get("city").get("county").get("country").get("name"), countryName));
+        }
+
+        if (filterByCounty) {
+            locationPredicates.add(cb.equal(root.get("city").get("county").get("name"), countyName));
+        }
+
+        if (filterByCity) {
+            locationPredicates.add(cb.equal(root.get("city").get("name"), cityName));
+        }
+
+        return cb.and(locationPredicates.toArray(new Predicate[0]));
     }
 
     // Helper method to build recursive category predicate (basically filtering by category and its ancestors)
