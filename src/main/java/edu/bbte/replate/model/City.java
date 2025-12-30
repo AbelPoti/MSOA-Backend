@@ -5,9 +5,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 @Entity
+@ToString(callSuper = true)
 public class City extends BaseEntity {
     @Column(nullable = false)
     private String name;

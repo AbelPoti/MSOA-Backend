@@ -2,11 +2,13 @@ package edu.bbte.replate.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.List;
 
 @Getter
 @Entity
+@ToString(callSuper = true, exclude = "cities")
 public class County extends BaseEntity {
     @Column(nullable = false, length = 63)
     private String name;

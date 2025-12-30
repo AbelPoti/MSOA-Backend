@@ -3,6 +3,7 @@ package edu.bbte.replate.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.sql.Date;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@ToString(callSuper = true, exclude = "listings")
 public class User extends BaseEntity {
     @Column(unique = true, nullable = false, length = 31)
     private String username;
