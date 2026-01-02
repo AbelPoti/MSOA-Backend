@@ -125,5 +125,12 @@
     <!-- security -->
     <rule ref="category/java/security.xml"/>
 
+    <!-- PrePersist methods -->
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod">
+        <properties>
+            <property name="ignoredAnnotations" value="jakarta.persistence.PrePersist"/>
+        </properties>
+    </rule>
+
 
 </ruleset>
