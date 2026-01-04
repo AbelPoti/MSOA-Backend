@@ -4,9 +4,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.jspecify.annotations.NonNull;
 
 import java.sql.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -14,6 +17,7 @@ import java.util.List;
 @ToString(callSuper = true, exclude = "listings")
 public class User extends BaseEntity {
     @Column(unique = true, nullable = false, length = 31)
+    @NonNull
     private String username;
 
     @Column(unique = true, nullable = false)
@@ -27,6 +31,15 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private Date joinDate;
+
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "role")
+    private Set<UserRole> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Listing> listings;
