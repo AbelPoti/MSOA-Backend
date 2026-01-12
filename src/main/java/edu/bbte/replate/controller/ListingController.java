@@ -149,6 +149,11 @@ public class ListingController {
             throw new BadRequestException("Id mismatch between URL and body.");
         }
 
+        Listing preExistingListing = listingService.findById(id);
+        if (preExistingListing != null) {
+            throw new ResourceNotFoundException("Listing with id " + id + " not found.");
+        }
+
         City city = locationService.findCityById(dto.cityId());
         if (city == null) {
             throw new BadRequestException("No city with id " + dto.cityId() + " exists.");
@@ -165,23 +170,8 @@ public class ListingController {
         User user = userService.findByUsername(principal.getUsername());
         listing.setOwner(user);
 
-        // Return different responses whether the listing existed already
-        Listing preExistingListing = listingService.findById(id);
-        if (preExistingListing != null) {
-            listingService.update(listing);
-            return ResponseEntity.ok(listingMapper.listingToDetailedOutDto(listing));
-        }
-
-        Listing createdListing = listingService.create(listing);
-
-        // Send the created entity's access path in the Location header
-        URI createdUri = URI.create("/listings/" + createdListing.getId());
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.setLocation(createdUri);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(listingMapper.listingToDetailedOutDto(createdListing));
+        listingService.update(listing);
+        return ResponseEntity.ok(listingMapper.listingToDetailedOutDto(listing));
     }
 
     @DeleteMapping("/{id}")
