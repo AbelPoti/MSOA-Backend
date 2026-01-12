@@ -139,7 +139,7 @@ public class ListingController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("@listingSecurity.isOwner(#id)")
-    public ResponseEntity<ListingDetailedOutDto> handlePut(
+    public ResponseEntity<Map<String, String>> handlePut(
             @PathVariable long id,
             @RequestBody @Valid ListingUpdateDto dto,
             @AuthenticationPrincipal UserDetails principal) {
@@ -150,7 +150,7 @@ public class ListingController {
         }
 
         Listing preExistingListing = listingService.findById(id);
-        if (preExistingListing != null) {
+        if (preExistingListing == null) {
             throw new ResourceNotFoundException("Listing with id " + id + " not found.");
         }
 
@@ -171,7 +171,9 @@ public class ListingController {
         listing.setOwner(user);
 
         listingService.update(listing);
-        return ResponseEntity.ok(listingMapper.listingToDetailedOutDto(listing));
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("Message", "Listing updated successfully.");
+        return ResponseEntity.ok(responseBody);
     }
 
     @DeleteMapping("/{id}")

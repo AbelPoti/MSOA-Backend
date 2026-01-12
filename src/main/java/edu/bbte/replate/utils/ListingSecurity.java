@@ -27,7 +27,7 @@ public class ListingSecurity {
 
         Listing listing = listingService.findById(listingId);
         if (listing == null) {
-            throw new ResourceNotFoundException("Listing with id " + listingId + " not found.");
+            return false;
         }
 
         return principal != null && Objects.equals(listing.getOwner().getId(), principal.getId());
