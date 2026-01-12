@@ -1,19 +1,17 @@
 package edu.bbte.replate.service.impl;
 
 import edu.bbte.replate.dto.incoming.FilterCriteria;
-import edu.bbte.replate.dto.incoming.ListingCreateDto;
 import edu.bbte.replate.exception.ResourceNotFoundException;
 import edu.bbte.replate.mapper.ListingMapper;
-import edu.bbte.replate.model.Category;
-import edu.bbte.replate.model.City;
 import edu.bbte.replate.model.Listing;
-import edu.bbte.replate.model.User;
 import edu.bbte.replate.repository.ListingRepository;
 import edu.bbte.replate.service.CategoryService;
 import edu.bbte.replate.service.ListingService;
 import edu.bbte.replate.service.LocationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,15 +38,15 @@ public class ListingServiceImpl implements ListingService {
     }
 
     @Override
-    public List<Listing> findAll() {
+    public Page<Listing> findAll(Pageable pageable) {
         log.info("Requested all listings");
-        return listingRepository.findAll();
+        return listingRepository.findAll(pageable);
     }
 
     @Override
-    public List<Listing> findByFilters(FilterCriteria filters) {
+    public Page<Listing> findByFilters(FilterCriteria filters, Pageable pageable) {
         log.info("Requested listing by filters: {}", filters);
-        return listingRepository.findListingsByFilters(filters);
+        return listingRepository.findListingsByFilters(filters, pageable);
     }
 
     @Override

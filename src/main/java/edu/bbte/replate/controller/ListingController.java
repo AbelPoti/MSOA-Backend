@@ -19,6 +19,10 @@ import edu.bbte.replate.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -108,16 +112,21 @@ public class ListingController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<ListingSimpleOutDto>> handleGetAll(
-            @RequestBody(required = false) @Valid FilterCriteria filterCriteria
+            @RequestBody(required = false) @Valid FilterCriteria filterCriteria,
+            @PageableDefault(
+                    size = 20,
+                    sort = "datePosted",
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable
     ) {
         log.info("Handling GET /listings request.");
 
-        List<Listing> listings;
+        Page<Listing> listings;
 
         if (filterCriteria == null || !isAnyFilterCriterionSet(filterCriteria)) {
-            listings = listingService.findAll();
+            listings = listingService.findAll(pageable);
         } else {
-            listings = listingService.findByFilters(filterCriteria);
+            listings = listingService.findByFilters(filterCriteria, pageable);
         }
 
         List<ListingSimpleOutDto> outDtos = listings.stream()

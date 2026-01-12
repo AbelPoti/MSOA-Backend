@@ -6,6 +6,8 @@ import edu.bbte.replate.model.Listing;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -13,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface ListingRepository extends JpaRepository<Listing, Long>, JpaSpecificationExecutor<Listing> {
-    default List<Listing> findListingsByFilters(FilterCriteria filterCriteria) {
+    default Page<Listing> findListingsByFilters(FilterCriteria filterCriteria, Pageable pageable) {
         return findAll((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -42,7 +44,7 @@ public interface ListingRepository extends JpaRepository<Listing, Long>, JpaSpec
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
-        });
+        }, pageable);
     }
 
     // Helper method to build location predicate based on country, county, and city
