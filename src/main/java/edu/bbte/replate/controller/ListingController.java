@@ -132,7 +132,13 @@ public class ListingController {
                 .map(listingMapper::listingToSimpleOutDto)
                 .toList();
 
-        return new ResponseEntity<>(outDtos, HttpStatus.OK);
+        // Return number of page and total number of pages in header
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("page", String.valueOf(listings.getNumber()));
+        headers.add("per_pages", String.valueOf(listings.getNumberOfElements()));
+        headers.add("total_pages", String.valueOf(listings.getTotalPages()));
+
+        return new ResponseEntity<>(outDtos, headers, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
@@ -147,8 +153,6 @@ public class ListingController {
         if (dto.id() != id) {
             throw new BadRequestException("Id mismatch between URL and body.");
         }
-
-        Listing preExistingListing = listingService.findById(id);
 
         City city = locationService.findCityById(dto.cityId());
         if (city == null) {
