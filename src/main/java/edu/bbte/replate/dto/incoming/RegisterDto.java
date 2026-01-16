@@ -1,6 +1,8 @@
 package edu.bbte.replate.dto.incoming;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record RegisterDto(
@@ -10,6 +12,7 @@ public record RegisterDto(
 
         @NotBlank(message = "Email cannot be empty.")
         @Size(min = 1, max = 254, message = "Email must have a maximum of 254 characters.")
+        @Email
         String email,
 
         @NotBlank(message = "Password cannot be empty.")
@@ -21,6 +24,10 @@ public record RegisterDto(
         String repeatPassword,
 
         @NotBlank(message = "Phone number cannot be empty.")
-        @Size(max = 13, message = "Phone number must have a maximum of 13 digits.")
+        @Size(max = 15, message = "Phone number must have a maximum of 15 digits.")
+        @Pattern(
+                regexp = "^\\+\\d{1,3}\\d{1,14}$",
+                message = "Invalid phone number (E.164 format required)"
+        )
         String phoneNumber
 ) {}

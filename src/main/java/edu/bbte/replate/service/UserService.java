@@ -14,6 +14,8 @@ public interface UserService extends UserDetailsService {
 
     User findByUsername(String username);
 
+    User findByEmail(String email);
+
     // Return UserDetails for Spring Security
     @NonNull
     @Override

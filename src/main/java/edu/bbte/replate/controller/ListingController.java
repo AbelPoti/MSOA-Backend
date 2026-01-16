@@ -149,9 +149,6 @@ public class ListingController {
         }
 
         Listing preExistingListing = listingService.findById(id);
-        if (preExistingListing == null) {
-            throw new ResourceNotFoundException("Listing with id " + id + " not found.");
-        }
 
         City city = locationService.findCityById(dto.cityId());
         if (city == null) {

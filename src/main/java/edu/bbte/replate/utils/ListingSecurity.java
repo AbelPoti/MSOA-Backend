@@ -1,7 +1,6 @@
 package edu.bbte.replate.utils;
 
 import edu.bbte.replate.model.Listing;
-import edu.bbte.replate.model.UserDetailsImpl;
 import edu.bbte.replate.service.ListingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;

@@ -3,7 +3,7 @@ package edu.bbte.replate.service.impl;
 import edu.bbte.replate.dto.incoming.RegisterDto;
 import edu.bbte.replate.mapper.UserMapper;
 import edu.bbte.replate.model.User;
-import edu.bbte.replate.model.UserDetailsImpl;
+import edu.bbte.replate.utils.UserDetailsImpl;
 import edu.bbte.replate.model.UserRole;
 import edu.bbte.replate.repository.UserRepository;
 import edu.bbte.replate.service.UserService;
@@ -47,6 +47,12 @@ public class UserServiceImpl implements UserService {
     public User findByUsername(String username) {
         log.info("Attempting to find user with username: {}", username);
         return userRepository.findUserByUsername(username);
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        log.info("Attempting to find user with email: {}", email);
+        return userRepository.findUserByEmail(email);
     }
 
     @Override

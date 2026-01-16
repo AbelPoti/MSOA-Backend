@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.jspecify.annotations.NonNull;
 
 import java.sql.Date;
 import java.util.EnumSet;
@@ -17,7 +16,6 @@ import java.util.Set;
 @ToString(callSuper = true, exclude = "listings")
 public class User extends BaseEntity {
     @Column(unique = true, nullable = false, length = 31)
-    @NonNull
     private String username;
 
     @Column(unique = true, nullable = false)

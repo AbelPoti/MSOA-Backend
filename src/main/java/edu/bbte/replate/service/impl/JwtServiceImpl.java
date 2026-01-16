@@ -1,6 +1,6 @@
 package edu.bbte.replate.service.impl;
 
-import edu.bbte.replate.model.UserDetailsImpl;
+import edu.bbte.replate.utils.UserDetailsImpl;
 import edu.bbte.replate.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

@@ -48,14 +48,22 @@ public class AuthController {
         }
 
         // Existing username check
-        // Return CREATED regardless to prevent user enumeration
         if (userService.findByUsername(registerDto.username()) != null) {
             log.warn(
                     "A user with the username '{}' is already registered, cannot register new user.",
                     registerDto.username());
 
-            responseBody.put("Message", "User registered successfully.");
-            return new ResponseEntity<>(responseBody, HttpStatus.CREATED);
+            responseBody.put("Message", "A user with an identical username already exists.");
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        }
+
+        // Existing email check
+        if (userService.findByEmail(registerDto.email()) != null) {
+            log.warn(
+                    "A user with the email address '{}' is already registered, cannot register new user.",
+                    registerDto.email());
+            responseBody.put("Message", "A user with an identical email address already exists.");
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
         }
 
         User savedUser = userService.register(registerDto);

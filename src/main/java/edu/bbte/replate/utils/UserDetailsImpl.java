@@ -1,5 +1,7 @@
-package edu.bbte.replate.model;
+package edu.bbte.replate.utils;
 
+import edu.bbte.replate.model.User;
+import edu.bbte.replate.model.UserRole;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

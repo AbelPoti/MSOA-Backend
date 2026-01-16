@@ -1,6 +1,5 @@
 package edu.bbte.replate.utils;
 
-import edu.bbte.replate.model.UserDetailsImpl;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
