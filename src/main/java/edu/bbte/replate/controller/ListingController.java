@@ -5,6 +5,7 @@ import edu.bbte.replate.dto.incoming.ListingCreateDto;
 import edu.bbte.replate.dto.incoming.ListingUpdateDto;
 import edu.bbte.replate.dto.outgoing.ListingDetailedOutDto;
 import edu.bbte.replate.dto.outgoing.ListingSimpleOutDto;
+import edu.bbte.replate.dto.outgoing.SimpleMessageResponseDto;
 import edu.bbte.replate.exception.BadRequestException;
 import edu.bbte.replate.exception.ResourceNotFoundException;
 import edu.bbte.replate.mapper.ListingMapper;
@@ -33,13 +34,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/listings")
 @Slf4j
-public class ListingController {
+public class    ListingController {
     @Autowired
     private ListingService listingService;
 
@@ -57,7 +56,7 @@ public class ListingController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Map<String, String>> handlePost(
+    public ResponseEntity<SimpleMessageResponseDto> handlePost(
             @RequestBody @Valid ListingCreateDto dto,
             @AuthenticationPrincipal UserDetails principal
     ) {
@@ -86,8 +85,7 @@ public class ListingController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(createdUri);
 
-        Map<String, String> responseBody = new ConcurrentHashMap<>();
-        responseBody.put("Message", "New listing created successfully.");
+        var responseBody = new SimpleMessageResponseDto("New listing created successfully.");
 
         return new ResponseEntity<>(responseBody, responseHeaders, HttpStatus.CREATED);
     }
@@ -144,7 +142,7 @@ public class ListingController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("@listingSecurity.isOwner(#id)")
-    public ResponseEntity<Map<String, String>> handlePut(
+    public ResponseEntity<SimpleMessageResponseDto> handlePut(
             @PathVariable long id,
             @RequestBody @Valid ListingUpdateDto dto,
             @AuthenticationPrincipal UserDetails principal) {
@@ -171,21 +169,19 @@ public class ListingController {
         listing.setOwner(user);
 
         listingService.update(listing);
-        Map<String, String> responseBody = new ConcurrentHashMap<>();
-        responseBody.put("Message", "Listing updated successfully.");
+        var responseBody = new SimpleMessageResponseDto("Listing updated successfully.");
         return ResponseEntity.ok(responseBody);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@listingSecurity.isOwner(#id)")
-    public ResponseEntity<Map<String, String>> handleDelete(@PathVariable long id) {
+    public ResponseEntity<SimpleMessageResponseDto> handleDelete(@PathVariable long id) {
         log.info("Handling DELETE /listings/{} request.", id);
-        Map<String, String> responseBody = new ConcurrentHashMap<>();
 
         listingService.delete(id);
 
-        responseBody.put("Message", "Successfully deleted listing.");
+        var responseBody = new SimpleMessageResponseDto("Successfully deleted listing.");
         return new ResponseEntity<>(responseBody, HttpStatus.NO_CONTENT);
     }
 

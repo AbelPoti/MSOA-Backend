@@ -1,5 +1,7 @@
 package edu.bbte.replate.controlleradvice;
 
+import edu.bbte.replate.dto.outgoing.SimpleMessageResponseDto;
+import edu.bbte.replate.dto.outgoing.ValidationErrorResponseDto;
 import edu.bbte.replate.exception.BadRequestException;
 import edu.bbte.replate.exception.InternalServerErrorException;
 import edu.bbte.replate.exception.ResourceNotFoundException;
@@ -23,51 +25,47 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ResponseEntity<Map<String, String>> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+    public ResponseEntity<ValidationErrorResponseDto> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
         log.warn("MethodArgumentNotValidException occurred : {}", e.getMessage());
         Map<String, String> errors = new ConcurrentHashMap<>();
         e.getBindingResult().getFieldErrors()
                 .forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
-        return ResponseEntity.badRequest().body(errors);
+        var responseBody = new ValidationErrorResponseDto(errors);
+        return ResponseEntity.badRequest().body(responseBody);
     }
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ResponseEntity<Map<String, String>> handleBadRequest(BadRequestException e) {
+    public ResponseEntity<SimpleMessageResponseDto> handleBadRequest(BadRequestException e) {
         log.warn("BadRequestException occurred: {}", e.getMessage());
-        Map<String, String> responseBody = new ConcurrentHashMap<>();
-        responseBody.put("Message", e.getMessage());
+        var responseBody = new SimpleMessageResponseDto(e.getMessage());
         return ResponseEntity.badRequest().body(responseBody);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Map<String, String>> handleResourceNotFound(ResourceNotFoundException e) {
+    public ResponseEntity<SimpleMessageResponseDto> handleResourceNotFound(ResourceNotFoundException e) {
         log.warn("ResourceNotFoundException occurred: {}", e.getMessage());
-        Map<String, String> responseBody = new ConcurrentHashMap<>();
-        responseBody.put("Message", e.getMessage());
+        var responseBody = new SimpleMessageResponseDto(e.getMessage());
         return new ResponseEntity<>(responseBody, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException e) {
+    public ResponseEntity<SimpleMessageResponseDto> handleAccessDenied(AccessDeniedException e) {
         log.warn("AccessDeniedException occurred: {}", e.getMessage());
-        Map<String, String> responseBody = new ConcurrentHashMap<>();
-        responseBody.put("Message", e.getMessage());
+        var responseBody = new SimpleMessageResponseDto(e.getMessage());
         return new ResponseEntity<>(responseBody, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(InternalServerErrorException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<Map<String, String>> handleInternalServerError(
+    public ResponseEntity<SimpleMessageResponseDto> handleInternalServerError(
             InternalServerErrorException e
     ) {
         log.error("Internal server error occurred: {}", e.getMessage());
-        Map<String, String> responseBody = new ConcurrentHashMap<>();
-        responseBody.put("Message", "An internal server error occurred.");
+        var responseBody = new SimpleMessageResponseDto("An internal server error occurred.");
         return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
-

@@ -2,6 +2,8 @@ package edu.bbte.replate.controller;
 
 import edu.bbte.replate.dto.incoming.LoginDto;
 import edu.bbte.replate.dto.incoming.RegisterDto;
+import edu.bbte.replate.dto.outgoing.LoginResponseDto;
+import edu.bbte.replate.dto.outgoing.SimpleMessageResponseDto;
 import edu.bbte.replate.exception.BadRequestException;
 import edu.bbte.replate.exception.InternalServerErrorException;
 import edu.bbte.replate.model.User;
@@ -18,9 +20,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 @RestController
 @RequestMapping("/auth")
 @Slf4j
@@ -36,10 +35,8 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Map<String, String>> handleRegister(@RequestBody @Valid RegisterDto registerDto) {
+    public ResponseEntity<SimpleMessageResponseDto> handleRegister(@RequestBody @Valid RegisterDto registerDto) {
         log.info("Handling POST /auth/register request with username '{}'", registerDto.username());
-
-        Map<String, String> responseBody = new ConcurrentHashMap<>();
 
         // Equal passwords check
         if (!registerDto.password().equals(registerDto.repeatPassword())) {
@@ -53,7 +50,7 @@ public class AuthController {
                     "A user with the username '{}' is already registered, cannot register new user.",
                     registerDto.username());
 
-            responseBody.put("Message", "A user with an identical username already exists.");
+            var responseBody = new SimpleMessageResponseDto("A user with an identical username already exists.");
             return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
         }
 
@@ -62,7 +59,7 @@ public class AuthController {
             log.warn(
                     "A user with the email address '{}' is already registered, cannot register new user.",
                     registerDto.email());
-            responseBody.put("Message", "A user with an identical email address already exists.");
+            var responseBody = new SimpleMessageResponseDto("A user with an identical email address already exists.");
             return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
         }
 
@@ -73,16 +70,14 @@ public class AuthController {
                 savedUser.getId());
 
         // Do not send location after user registration
-        responseBody.put("Message", "User registered successfully.");
+        var responseBody = new SimpleMessageResponseDto("User registered successfully.");
         return new ResponseEntity<>(responseBody, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Map<String, String>> handleLogin(@RequestBody @Valid LoginDto loginDto) {
+    public ResponseEntity<LoginResponseDto> handleLogin(@RequestBody @Valid LoginDto loginDto) {
         log.info("Handling POST /auth/login request with username '{}'", loginDto.username());
-
-        Map<String, String> responseBody = new ConcurrentHashMap<>();
 
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -91,10 +86,8 @@ public class AuthController {
 
             if (authentication.isAuthenticated()) {
                 String token = jwtService.generateToken(authentication);
-                responseBody.put("Message", "Login successful.");
-                responseBody.put("Token", token);
-
                 log.info("User login is successful.");
+                var responseBody = new LoginResponseDto("Login successful.", token);
                 return new ResponseEntity<>(responseBody, HttpStatus.OK);
             } else {
                 log.warn("User login failed");
