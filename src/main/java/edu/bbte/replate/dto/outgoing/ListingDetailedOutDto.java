@@ -9,7 +9,7 @@ public record ListingDetailedOutDto(
         String description,
         Double price,
         Timestamp datePosted,
-        CityOutDto city,
+        CityWithParentCountyOutDto city,
         String locationDetails,
         CategorySimpleOutDto category,
         Long ownerId,

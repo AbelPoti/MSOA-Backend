@@ -1,8 +1,8 @@
 package edu.bbte.replate.dto.outgoing;
 
-public record CountyOutDto(
+public record CountyWithParentCountryOutDto(
         Long id,
         String name,
-        CountryOutDto country
+        CountrySimpleOutDto country
 ) {
 }
