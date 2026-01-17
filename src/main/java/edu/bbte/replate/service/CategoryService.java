@@ -12,4 +12,6 @@ public interface CategoryService {
     List<Category> findTopLevelCategories();
 
     List<Category> findSubcategories(String parentCategoryName);
+
+    List<Category> getParentCategoryChain(Long id);
 }

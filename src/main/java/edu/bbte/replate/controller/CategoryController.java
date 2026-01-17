@@ -2,7 +2,6 @@ package edu.bbte.replate.controller;
 
 import edu.bbte.replate.dto.outgoing.CategorySimpleOutDto;
 import edu.bbte.replate.dto.outgoing.CategoryTreeOutDto;
-import edu.bbte.replate.dto.outgoing.SimpleMessageResponseDto;
 import edu.bbte.replate.exception.ResourceNotFoundException;
 import edu.bbte.replate.mapper.CategoryMapper;
 import edu.bbte.replate.model.Category;
@@ -42,7 +41,7 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<CategoryTreeOutDto> handleGetCategory(@PathVariable long id) {
+    public ResponseEntity<CategoryTreeOutDto> handleGetById(@PathVariable long id) {
         log.info("Handling GET /categories/{} request.", id);
 
         Category category = categoryService.findById(id);
@@ -53,5 +52,42 @@ public class CategoryController {
         CategoryTreeOutDto categoryTree = categoryMapper.categoryToCategoryTreeOutDto(category);
 
         return ResponseEntity.ok(categoryTree);
+    }
+
+    @GetMapping("/{id}/subcategories")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<CategorySimpleOutDto>> handleGetSubcategoriesById(@PathVariable long id) {
+        log.info("Handling GET /categories/{}/subcategories request.", id);
+
+        Category category = categoryService.findById(id);
+        if (category == null) {
+            throw new ResourceNotFoundException(
+                    "Category with id " + id + " not found, so it cannot have subcategories.");
+        }
+
+        List<Category> subcategories = categoryService.findSubcategories(category.getName());
+
+        List<CategorySimpleOutDto> outDtos = subcategories
+                .stream()
+                .map(categoryMapper::categoryToSimpleOutDto)
+                .toList();
+
+        return ResponseEntity.ok(outDtos);
+    }
+
+    @GetMapping("/{id}/parent-categories")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<CategorySimpleOutDto>> handleGetParentsById(@PathVariable long id) {
+        log.info("Handling GET /categories/{}/parent-categories request.", id);
+
+        // This method call already throws ResourceNotFoundException if no category with id exists.
+        List<Category> parents = categoryService.getParentCategoryChain(id);
+
+        List<CategorySimpleOutDto> outDtos = parents
+                .stream()
+                .map(categoryMapper::categoryToSimpleOutDto)
+                .toList();
+
+        return ResponseEntity.ok(outDtos);
     }
 }

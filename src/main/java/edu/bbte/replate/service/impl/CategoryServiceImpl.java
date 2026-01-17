@@ -1,5 +1,6 @@
 package edu.bbte.replate.service.impl;
 
+import edu.bbte.replate.exception.ResourceNotFoundException;
 import edu.bbte.replate.model.Category;
 import edu.bbte.replate.repository.CategoryRepository;
 import edu.bbte.replate.service.CategoryService;
@@ -7,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -39,5 +42,28 @@ public class CategoryServiceImpl implements CategoryService {
         log.info("Requested subcategories of category: {}", parentCategoryName);
         Category parent = categoryRepository.findCategoryByName(parentCategoryName);
         return parent != null ? parent.getSubcategories() : null;
+    }
+
+    @Override
+    public List<Category> getParentCategoryChain(Long id) {
+        Category category = categoryRepository.findById(id).orElse(null);
+        /*
+        * Throw here, because if we return an empty list, we cannot tell if the category has no parents
+        * or just doesn't exist at all
+        * */
+        if (category == null) throw new ResourceNotFoundException(
+                "No category with id " + id + " was found, so it cannot have parent categories.");
+
+        List<Category> parents = new ArrayList<>();
+        Category current = category.getParentCategory();
+
+        while (current != null) {
+            parents.add(current);
+            current = current.getParentCategory();
+        }
+
+        // So it points from top-level to the leaf
+        Collections.reverse(parents);
+        return parents;
     }
 }
