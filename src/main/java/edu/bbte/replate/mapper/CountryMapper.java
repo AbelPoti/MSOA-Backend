@@ -1,7 +1,6 @@
 package edu.bbte.replate.mapper;
 
 import edu.bbte.replate.dto.outgoing.CountrySimpleOutDto;
-import edu.bbte.replate.dto.outgoing.CountryWithChildCountiesOutDto;
 import edu.bbte.replate.model.Country;
 import org.mapstruct.Mapper;
 
