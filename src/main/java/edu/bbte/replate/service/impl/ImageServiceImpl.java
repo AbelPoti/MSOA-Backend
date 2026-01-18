@@ -91,7 +91,7 @@ public class ImageServiceImpl implements ImageService  {
         Image image = listing.getImages().stream()
                 .filter(i -> i.getId().equals(imageId))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("No image with id " + listingId + " was found."));
+                .orElseThrow(() -> new ResourceNotFoundException("No image with id " + imageId + " was found."));
 
         deleteFile(image.getFilePath());
         listing.getImages().remove(image);
