@@ -34,6 +34,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(responseBody);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ResponseEntity<ValidationErrorResponseDto> handleIllegalArgument(IllegalArgumentException e) {
+        log.warn("IllegalArgumentException occurred: {}", e.getMessage());
+        Map<String, String> errors = new ConcurrentHashMap<>();
+        errors.put("", e.getMessage());
+        var responseBody = new ValidationErrorResponseDto(errors);
+        return ResponseEntity.badRequest().body(responseBody);
+    }
+
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody

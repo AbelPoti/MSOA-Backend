@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Folder for uploaded user content ###
+/uploads/**
