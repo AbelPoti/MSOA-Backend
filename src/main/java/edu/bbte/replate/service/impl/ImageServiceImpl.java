@@ -59,6 +59,10 @@ public class ImageServiceImpl implements ImageService  {
 
     @Override
     public Image upload(Long listingId, MultipartFile file) {
+        // It would be a bad idea to move this down right before adding the new image to the listing, since:
+        // - We check for non-existent listing ASAP
+        // - If the listing truly did not exist, the image would still get uploaded.
+        @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
         Listing listing = getListingOrElseThrow(listingId);
 
         validateImage(file);
@@ -111,7 +115,7 @@ public class ImageServiceImpl implements ImageService  {
             throw new IllegalArgumentException("Provided image file cannot be empty.");
         }
 
-        if (file.getContentType() == null && !file.getContentType().startsWith("image/")) {
+        if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
             throw new IllegalArgumentException("Only image type files are allowed.");
         }
     }
@@ -120,7 +124,7 @@ public class ImageServiceImpl implements ImageService  {
     private String generateFileName(MultipartFile file) {
         String ext = Optional.ofNullable(file.getOriginalFilename())
                 .filter(n -> n.contains("."))
-                .map(n -> n.substring(n.lastIndexOf(".")))
+                .map(n -> n.substring(n.indexOf('.')))
                 .orElse("");
 
         return UUID.randomUUID() + ext;

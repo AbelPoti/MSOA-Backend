@@ -51,8 +51,10 @@ public class CategoryServiceImpl implements CategoryService {
         * Throw here, because if we return an empty list, we cannot tell if the category has no parents
         * or just doesn't exist at all
         * */
-        if (category == null) throw new ResourceNotFoundException(
-                "No category with id " + id + " was found, so it cannot have parent categories.");
+        if (category == null) {
+            throw new ResourceNotFoundException(
+                    "No category with id " + id + " was found, so it cannot have parent categories.");
+        }
 
         List<Category> parents = new ArrayList<>();
         Category current = category.getParentCategory();
