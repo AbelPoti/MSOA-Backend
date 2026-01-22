@@ -6,6 +6,7 @@ import edu.bbte.replate.exception.BadRequestException;
 import edu.bbte.replate.exception.InternalServerErrorException;
 import edu.bbte.replate.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,6 +23,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    @Value("${spring.servlet.multipart.max-file-size}")
+    private String maxUploadSize;
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -78,5 +83,15 @@ public class GlobalExceptionHandler {
         log.error("Internal server error occurred: {}", e.getMessage());
         var responseBody = new SimpleMessageResponseDto("An internal server error occurred.");
         return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.CONTENT_TOO_LARGE)
+    public ResponseEntity<SimpleMessageResponseDto> handleMaxUploadSizeExceeded(MaxUploadSizeExceededException e) {
+        log.warn("MaxUploadSizeExceededException occurred: {}", e.getMessage());
+
+        var responseBody = new SimpleMessageResponseDto(
+                "File too large for upload. Maximum size is " + maxUploadSize + ".");
+        return new ResponseEntity<>(responseBody, HttpStatus.CONTENT_TOO_LARGE);
     }
 }
