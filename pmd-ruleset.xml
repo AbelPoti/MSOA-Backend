@@ -132,5 +132,11 @@
         </properties>
     </rule>
 
+    <!-- Coupling between objects -->
+    <rule ref="category/java/design.xml/CouplingBetweenObjects">
+        <properties>
+            <property name="threshold" value="25" />
+        </properties>
+    </rule>
 
 </ruleset>

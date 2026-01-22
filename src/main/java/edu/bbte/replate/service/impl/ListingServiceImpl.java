@@ -1,14 +1,15 @@
 package edu.bbte.replate.service.impl;
 
 import edu.bbte.replate.dto.incoming.FilterCriteria;
+import edu.bbte.replate.exception.ResourceNotFoundException;
 import edu.bbte.replate.model.Listing;
 import edu.bbte.replate.repository.ListingRepository;
 import edu.bbte.replate.service.ListingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @Slf4j
@@ -23,15 +24,15 @@ public class ListingServiceImpl implements ListingService {
     }
 
     @Override
-    public List<Listing> findAll() {
+    public Page<Listing> findAll(Pageable pageable) {
         log.info("Requested all listings");
-        return listingRepository.findAll();
+        return listingRepository.findAll(pageable);
     }
 
     @Override
-    public List<Listing> findByFilters(FilterCriteria filters) {
+    public Page<Listing> findByFilters(FilterCriteria filters, Pageable pageable) {
         log.info("Requested listing by filters: {}", filters);
-        return listingRepository.findListingsByFilters(filters);
+        return listingRepository.findListingsByFilters(filters, pageable);
     }
 
     @Override
@@ -49,6 +50,9 @@ public class ListingServiceImpl implements ListingService {
     @Override
     public void delete(Long id) {
         log.info("Attempting to delete listing with id: {}", id);
+        listingRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Listing with id " + id + " not found.")
+        );
         listingRepository.deleteById(id);
     }
 }

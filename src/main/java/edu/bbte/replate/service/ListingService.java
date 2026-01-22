@@ -2,15 +2,15 @@ package edu.bbte.replate.service;
 
 import edu.bbte.replate.dto.incoming.FilterCriteria;
 import edu.bbte.replate.model.Listing;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ListingService {
     Listing findById(Long id);
 
-    List<Listing> findAll();
+    Page<Listing> findAll(Pageable pageable);
 
-    List<Listing> findByFilters(FilterCriteria filters);
+    Page<Listing> findByFilters(FilterCriteria filters, Pageable pageable);
 
     Listing create(Listing listing);
 
