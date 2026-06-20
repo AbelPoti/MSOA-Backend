@@ -1,12 +1,14 @@
 package edu.bbte.replate.auth.service.impl;
 
 import edu.bbte.replate.auth.service.JwtService;
+import edu.bbte.replate.auth.utils.JwtKeyProvider;
 import edu.bbte.replate.auth.utils.UserDetailsImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,6 +22,9 @@ import java.util.function.Function;
 @Service
 @Slf4j
 public class JwtServiceImpl implements JwtService {
+    @Autowired
+    private JwtKeyProvider jwtKeyProvider;
+
     @Value("${jwt.secret}")
     private String jwtSecret;
 
@@ -44,7 +49,7 @@ public class JwtServiceImpl implements JwtService {
                 .claim("username", userPrincipal.getUsername())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(getSignKey())
+                .signWith(jwtKeyProvider.getPrivateKey(), Jwts.SIG.RS256)
                 .compact();
     }
 

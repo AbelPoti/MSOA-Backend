@@ -1,16 +1,15 @@
 package edu.bbte.replate.service.impl;
 
 import edu.bbte.replate.service.JwtService;
+import edu.bbte.replate.utils.JwtKeyProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
@@ -18,6 +17,9 @@ import java.util.function.Function;
 @Service
 @Slf4j
 public class JwtServiceImpl implements JwtService {
+    @Autowired
+    private JwtKeyProvider jwtKeyProvider;
+
     @Value("${jwt.secret}")
     private String jwtSecret;
 
@@ -49,7 +51,7 @@ public class JwtServiceImpl implements JwtService {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith(getSignKey())
+                .verifyWith(jwtKeyProvider.getPublicKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -66,10 +68,5 @@ public class JwtServiceImpl implements JwtService {
         } catch (JwtException e) {
             return false;
         }
-    }
-
-    private SecretKey getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
-        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
