@@ -38,3 +38,7 @@ out/
 
 ### Folder for uploaded user content ###
 /uploads/**
+
+### RSA keys
+*.pem
+*.key
