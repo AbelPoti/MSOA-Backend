@@ -12,12 +12,12 @@ public class AdminSecurity {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null) {
-            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            JwtPrincipal principal = (JwtPrincipal) authentication.getPrincipal();
 
-            SimpleGrantedAuthority adminAuthority = new SimpleGrantedAuthority(UserDetailsImpl.ADMIN_AUTHORITY_NAME);
-            // Safe to assert since JwtAuthFilter treats user as unauthorized if userDetails is invalid/not set
-            assert userDetails != null;
-            return userDetails.getAuthorities().contains(adminAuthority);
+            SimpleGrantedAuthority adminAuthority = new SimpleGrantedAuthority(JwtPrincipal.ADMIN_AUTHORITY_NAME);
+            // Safe to assert since JwtAuthFilter treats user as unauthorized if principal is invalid/not set
+            assert principal != null;
+            return authentication.getAuthorities().contains(adminAuthority);
         } else {
             throw new AccessDeniedException("Access to resource is unauthorized.");
         }

@@ -41,7 +41,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/locations/**").permitAll()
 
                         // Admin endpoints
-                        .requestMatchers("/admin/**").hasRole(UserDetailsImpl.ADMIN_AUTHORITY_NAME)
+                        .requestMatchers("/admin/**").hasRole(JwtPrincipal.ADMIN_AUTHORITY_NAME)
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

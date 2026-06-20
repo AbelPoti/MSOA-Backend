@@ -12,11 +12,10 @@ import edu.bbte.replate.mapper.ListingMapper;
 import edu.bbte.replate.model.Category;
 import edu.bbte.replate.model.City;
 import edu.bbte.replate.model.Listing;
-import edu.bbte.replate.model.User;
 import edu.bbte.replate.service.CategoryService;
 import edu.bbte.replate.service.ListingService;
 import edu.bbte.replate.service.LocationService;
-import edu.bbte.replate.service.UserService;
+import edu.bbte.replate.utils.JwtPrincipal;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -49,16 +47,13 @@ public class    ListingController {
     private CategoryService categoryService;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private ListingMapper listingMapper;
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<SimpleMessageResponseDto> handlePost(
             @RequestBody @Valid ListingCreateDto dto,
-            @AuthenticationPrincipal UserDetails principal
+            @AuthenticationPrincipal JwtPrincipal principal
     ) {
         log.info("Handling POST /listings request.");
 
@@ -75,8 +70,7 @@ public class    ListingController {
         Listing listing = listingMapper.createDtoToListing(dto);
         listing.setCity(city);
         listing.setCategory(category);
-        User user = userService.findByUsername(principal.getUsername());
-        listing.setOwner(user);
+        listing.setOwnerId(principal.userId());
 
         Listing createdListing = listingService.create(listing);
 
@@ -145,7 +139,7 @@ public class    ListingController {
     public ResponseEntity<SimpleMessageResponseDto> handlePut(
             @PathVariable long id,
             @RequestBody @Valid ListingUpdateDto dto,
-            @AuthenticationPrincipal UserDetails principal) {
+            @AuthenticationPrincipal JwtPrincipal principal) {
         log.info("Handling PUT /listings/{} request.", id);
 
         if (dto.id() != id) {
@@ -166,8 +160,7 @@ public class    ListingController {
         listing.setCity(city);
         listing.setCategory(category);
         listing.setImages(listingService.findById(listing.getId()).getImages());
-        User user = userService.findByUsername(principal.getUsername());
-        listing.setOwner(user);
+        listing.setOwnerId(principal.userId());
 
         listingService.update(listing);
         var responseBody = new SimpleMessageResponseDto("Listing updated successfully.");

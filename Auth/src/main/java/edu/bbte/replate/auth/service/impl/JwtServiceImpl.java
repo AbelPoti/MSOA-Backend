@@ -9,6 +9,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +34,14 @@ public class JwtServiceImpl implements JwtService {
         log.info("Subject of Jwt token: '{}'", userPrincipal.getUsername());
 
         return Jwts.builder()
-                .subject(userPrincipal.getUsername())
-                .claim("roles", userPrincipal.getAuthorities())
+                .subject(userPrincipal.getId().toString())
+                .claim(
+                        "roles",
+                        userPrincipal.getAuthorities()
+                                .stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .toList())
+                .claim("username", userPrincipal.getUsername())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSignKey())

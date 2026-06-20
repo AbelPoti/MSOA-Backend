@@ -1,7 +1,7 @@
 package edu.bbte.replate.filter;
 
 import edu.bbte.replate.service.JwtService;
-import edu.bbte.replate.service.UserService;
+import edu.bbte.replate.utils.JwtPrincipal;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -11,22 +11,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
     @Autowired
     private JwtService jwtService;
-
-    @Autowired
-    private UserService userService;
 
     @Override
     protected void doFilterInternal(
@@ -40,31 +38,44 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
                 String token = authorizationHeader.substring(7);
-                String username = jwtService.extractUsername(token);
 
-                // If no authentication is set in the context, Spring security treats the user as unauthorized
-                if (username != null && SecurityContextHolder.getContext().getAuthentication()  == null) {
-                    log.info("User is unauthorized, validating JWT.");
+                log.info("Validating JWT.");
 
-                    UserDetails userDetails = userService.loadUserByUsername(username);
+                if (jwtService.validateToken(token)) {
+                    log.info("JWT is valid, setting authentication in security context.");
 
-                    if (jwtService.validateToken(token, userDetails)) {
-                        log.info("JWT is valid, setting authentication in security context.");
-                        UsernamePasswordAuthenticationToken auth =
-                                new UsernamePasswordAuthenticationToken(
-                                        userDetails,
-                                        null,
-                                        userDetails.getAuthorities());
+                    String userId = jwtService.extractUserId(token);
 
-                        auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    String username = jwtService.extractUsernameClaim(token);
 
-                        SecurityContextHolder.getContext().setAuthentication(auth);
-                    } else {
-                        log.warn("Invalid JWT token.");
-                        SecurityContextHolder.clearContext();
-                    }
+                    List<String> roles =
+                            jwtService.extractRoles(token);
+
+                    List<SimpleGrantedAuthority> authorities =
+                            roles.stream()
+                                    .map(SimpleGrantedAuthority::new)
+                                    .toList();
+
+                    // Create a custom principal through which authorization will be the same flow as if it was done
+                    // From a UserDetails object
+                    JwtPrincipal principal =
+                            new JwtPrincipal(
+                                    Long.parseLong(userId),
+                                    username
+                            );
+
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(
+                                    principal,
+                                    null,
+                                    authorities);
+
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(auth);
                 } else {
-                    log.info("Authentication is already set in security context, no validation necessary.");
+                    log.warn("Invalid JWT token.");
+                    SecurityContextHolder.clearContext();
                 }
             } catch (JwtException | IllegalArgumentException e) {
                 log.warn("Invalid JWT token: {}", e.getMessage());
@@ -72,6 +83,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         } else {
             log.info("No authorization header is set in the request.");
+            SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);

@@ -1,12 +1,13 @@
 package edu.bbte.replate.service;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
+import java.util.List;
 
 public interface JwtService {
-    String generateToken(Authentication authentication);
+    boolean validateToken(String token);
 
-    String extractUsername(String token);
+    List<String> extractRoles(String token);
 
-    boolean validateToken(String token, UserDetails userDetails);
+    String extractUserId(String token);
+
+    String extractUsernameClaim(String token);
 }

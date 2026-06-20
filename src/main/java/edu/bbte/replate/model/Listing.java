@@ -39,9 +39,9 @@ public class Listing extends BaseEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
-    private User owner;
+    // Do not have a direct reference to User - would violate Database per Service pattern
+    @Column(nullable = false)
+    private Long ownerId;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "listing_id")

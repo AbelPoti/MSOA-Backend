@@ -21,13 +21,13 @@ public class ListingSecurity {
             return false;
         }
 
-        UserDetailsImpl principal = (UserDetailsImpl) authentication.getPrincipal();
+        JwtPrincipal principal = (JwtPrincipal) authentication.getPrincipal();
 
         Listing listing = listingService.findById(listingId);
         if (listing == null) {
             return false;
         }
 
-        return principal != null && Objects.equals(listing.getOwner().getId(), principal.getId());
+        return principal != null && Objects.equals(listing.getOwnerId(), principal.userId());
     }
 }
