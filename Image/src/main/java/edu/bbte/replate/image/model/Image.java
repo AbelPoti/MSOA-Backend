@@ -1,4 +1,4 @@
-package edu.bbte.replate.model;
+package edu.bbte.replate.image.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +11,9 @@ import lombok.ToString;
 @Entity
 @ToString(callSuper = true)
 public class Image extends BaseEntity {
+    @Column(nullable = false)
+    private Long listingId;
+
     @Column(nullable = false, unique = true)
     private String imageName;
 

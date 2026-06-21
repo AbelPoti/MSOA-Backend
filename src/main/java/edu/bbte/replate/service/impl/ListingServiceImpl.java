@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 @Slf4j
 public class ListingServiceImpl implements ListingService {
@@ -54,5 +56,15 @@ public class ListingServiceImpl implements ListingService {
                 new ResourceNotFoundException("Listing with id " + id + " not found.")
         );
         listingRepository.deleteById(id);
+    }
+
+    @Override
+    public boolean isOwner(Long listingId, Long userId) {
+        Listing listing = findById(listingId);
+        if (listing == null) {
+            return false;
+        }
+
+        return Objects.equals(listing.getOwnerId(), userId);
     }
 }

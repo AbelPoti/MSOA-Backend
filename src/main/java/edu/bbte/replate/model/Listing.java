@@ -7,13 +7,11 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
 @Entity
-@ToString(callSuper = true, exclude = "images")
+@ToString(callSuper = true)
 public class Listing extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String title;
@@ -43,13 +41,8 @@ public class Listing extends BaseEntity {
     @Column(nullable = false)
     private Long ownerId;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "listing_id")
-    private List<Image> images;
-
     @PrePersist
     private void onCreate() {
         datePosted = new Timestamp(System.currentTimeMillis());
-        images = new ArrayList<>();
     }
 }

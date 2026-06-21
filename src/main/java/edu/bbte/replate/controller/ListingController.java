@@ -159,7 +159,6 @@ public class    ListingController {
         Listing listing = listingMapper.updateDtoToListing(dto);
         listing.setCity(city);
         listing.setCategory(category);
-        listing.setImages(listingService.findById(listing.getId()).getImages());
         listing.setOwnerId(principal.userId());
 
         listingService.update(listing);

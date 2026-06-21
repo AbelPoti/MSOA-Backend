@@ -5,8 +5,6 @@ import edu.bbte.replate.auth.utils.JwtKeyProvider;
 import edu.bbte.replate.auth.utils.UserDetailsImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +13,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -24,9 +21,6 @@ import java.util.function.Function;
 public class JwtServiceImpl implements JwtService {
     @Autowired
     private JwtKeyProvider jwtKeyProvider;
-
-    @Value("${jwt.secret}")
-    private String jwtSecret;
 
     @Value("${jwt.expiration}")
     private long jwtExpirationMs;
@@ -69,7 +63,7 @@ public class JwtServiceImpl implements JwtService {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith(getSignKey())
+                .verifyWith(jwtKeyProvider.getPublicKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -86,10 +80,5 @@ public class JwtServiceImpl implements JwtService {
         log.info("Validating Jwt token against user with username '{}'", userDetails.getUsername());
         final String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
-    }
-
-    private SecretKey getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
-        return Keys.hmacShaKeyFor(keyBytes);
     }
 }

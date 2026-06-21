@@ -1,7 +1,7 @@
-package edu.bbte.replate.service;
+package edu.bbte.replate.image.service;
 
-import edu.bbte.replate.dto.outgoing.ImageDownloadDto;
-import edu.bbte.replate.model.Image;
+import edu.bbte.replate.image.dto.outgoing.ImageDownloadDto;
+import edu.bbte.replate.image.model.Image;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

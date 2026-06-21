@@ -14,14 +14,12 @@ public interface ListingMapper {
     @Mapping(target = "city", ignore = true)
     @Mapping(target = "category", ignore = true)
     @Mapping(target = "ownerId", ignore = true)
-    @Mapping(target = "images", ignore = true)
     @Mapping(target = "datePosted", ignore = true)
     Listing createDtoToListing(ListingCreateDto dto);
 
     @Mapping(target = "city", ignore = true)
     @Mapping(target = "category", ignore = true)
     @Mapping(target = "ownerId", ignore = true)
-    @Mapping(target = "images", ignore = true)
     @Mapping(target = "datePosted", ignore = true)
     Listing updateDtoToListing(ListingUpdateDto dto);
 

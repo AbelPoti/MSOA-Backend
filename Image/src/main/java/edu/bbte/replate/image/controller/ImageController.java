@@ -1,11 +1,13 @@
-package edu.bbte.replate.controller;
+package edu.bbte.replate.image.controller;
 
-import edu.bbte.replate.dto.outgoing.ImageDownloadDto;
-import edu.bbte.replate.dto.outgoing.ImageOutDto;
-import edu.bbte.replate.dto.outgoing.SimpleMessageResponseDto;
-import edu.bbte.replate.mapper.ImageMapper;
-import edu.bbte.replate.model.Image;
-import edu.bbte.replate.service.ImageService;
+import edu.bbte.replate.image.apiclient.ListingClient;
+import edu.bbte.replate.image.dto.outgoing.ImageDownloadDto;
+import edu.bbte.replate.image.dto.outgoing.ImageOutDto;
+import edu.bbte.replate.image.dto.outgoing.SimpleMessageResponseDto;
+import edu.bbte.replate.image.mapper.ImageMapper;
+import edu.bbte.replate.image.model.Image;
+import edu.bbte.replate.image.service.ImageService;
+import edu.bbte.replate.image.utils.JwtPrincipal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -13,7 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,16 +30,35 @@ public class ImageController {
     private ImageService imageService;
 
     @Autowired
+    private ListingClient listingClient;
+
+    @Autowired
     private ImageMapper imageMapper;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("@listingSecurity.isOwner(#listingId, authentication)")
     public ResponseEntity<SimpleMessageResponseDto> handleUploadImage(
             @PathVariable long listingId,
-            @RequestPart("file")MultipartFile file
+            @RequestPart("file")MultipartFile file,
+            @AuthenticationPrincipal JwtPrincipal principal
     ) {
         log.info("Handling POST /listing/{}/images request.", listingId);
+
+        // Call other service via ListingClient to see if the listing exists
+        if (!listingClient.doesExist(listingId).doesExist()) {
+            var responseBody = new SimpleMessageResponseDto(
+                    "Targeted listing does not exist, cannot post image to it!"
+            );
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        }
+
+        // Call other service via ListingClient to see if the listing is owned by the requesting user
+        if (!listingClient.isOwner(listingId, principal.userId()).isOwner()) {
+            var responseBody = new SimpleMessageResponseDto(
+                    "Requesting user does not own targeted listing, cannot post image to it!"
+            );
+            return new ResponseEntity<>(responseBody, HttpStatus.UNAUTHORIZED);
+        }
 
         Image createdImage = imageService.upload(listingId, file);
 
@@ -94,12 +115,28 @@ public class ImageController {
 
     @DeleteMapping("/{imageId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@listingSecurity.isOwner(#listingId, authentication)")
     public ResponseEntity<SimpleMessageResponseDto> handleDeleteImageOfListingById(
             @PathVariable long listingId,
-            @PathVariable long imageId
+            @PathVariable long imageId,
+            @AuthenticationPrincipal JwtPrincipal principal
     ) {
         log.info("Handling DELETE /listings/{}/images/{} request.", listingId, imageId);
+
+        // Check if the listing exists and is owned by the requesting user
+        if (!listingClient.doesExist(listingId).doesExist()) {
+            var responseBody = new SimpleMessageResponseDto(
+                    "Targeted listing does not exist, cannot delete image from it!"
+            );
+
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        }
+
+        if (!listingClient.isOwner(listingId, principal.userId()).isOwner()) {
+            var responseBody = new SimpleMessageResponseDto(
+                    "Requesting user does not own targeted listing, cannot delete image from it!"
+            );
+            return new ResponseEntity<>(responseBody, HttpStatus.UNAUTHORIZED);
+        }
 
         // Exceptions handled in service
         imageService.delete(listingId, imageId);

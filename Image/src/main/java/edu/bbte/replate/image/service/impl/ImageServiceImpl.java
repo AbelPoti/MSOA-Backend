@@ -1,13 +1,11 @@
-package edu.bbte.replate.service.impl;
+package edu.bbte.replate.image.service.impl;
 
-import edu.bbte.replate.dto.outgoing.ImageDownloadDto;
-import edu.bbte.replate.exception.InternalServerErrorException;
-import edu.bbte.replate.exception.ResourceNotFoundException;
-import edu.bbte.replate.model.Image;
-import edu.bbte.replate.model.Listing;
-import edu.bbte.replate.repository.ImageRepository;
-import edu.bbte.replate.service.ImageService;
-import edu.bbte.replate.service.ListingService;
+import edu.bbte.replate.image.dto.outgoing.ImageDownloadDto;
+import edu.bbte.replate.image.exception.InternalServerErrorException;
+import edu.bbte.replate.image.exception.ResourceNotFoundException;
+import edu.bbte.replate.image.model.Image;
+import edu.bbte.replate.image.repository.ImageRepository;
+import edu.bbte.replate.image.service.ImageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,9 +30,6 @@ public class ImageServiceImpl implements ImageService  {
     @Autowired
     private ImageRepository imageRepository;
 
-    @Autowired
-    private ListingService listingService;
-
     @Value("${app.images.upload-dir}")
     private Path uploadDir;
 
@@ -45,12 +40,14 @@ public class ImageServiceImpl implements ImageService  {
 
     @Override
     public Image findByListingIdAndImageId(Long listingId, Long imageId) {
-        Listing listing = getListingOrElseThrow(listingId);
+        List<Image> images = imageRepository.findAll();
 
-        return listing.getImages().stream()
+        return images.stream()
                 .filter(i -> i.getId().equals(imageId))
+                .filter(i -> i.getListingId().equals(listingId))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("No image with id " + imageId + " was found."));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No image with id " + imageId + " and with listingId " + listingId + " was found."));
     }
 
     @Override
@@ -60,17 +57,15 @@ public class ImageServiceImpl implements ImageService  {
 
     @Override
     public List<Image> findImagesByListingId(Long listingId) {
-        return getListingOrElseThrow(listingId).getImages();
+        List<Image> images = imageRepository.findAll();
+
+        return images.stream()
+                .filter(i -> i.getListingId().equals(listingId))
+                .toList();
     }
 
     @Override
     public Image upload(Long listingId, MultipartFile file) {
-        // It would be a bad idea to move this down right before adding the new image to the listing, since:
-        // - We check for non-existent listing ASAP
-        // - If the listing truly did not exist, the image would still get uploaded.
-        @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
-        Listing listing = getListingOrElseThrow(listingId);
-
         validateImage(file);
 
         String storedFileName = generateFileName(file);
@@ -88,24 +83,25 @@ public class ImageServiceImpl implements ImageService  {
         image.setImageName(storedFileName);
         image.setFilePath(targetPath.toString());
         image.setImageMimeType(file.getContentType());
+        image.setListingId(listingId);
 
-        listing.getImages().add(image);
-        listingService.update(listing);
+        // Create image entry in database - create directly, not through Listing anymore
+        image = imageRepository.saveAndFlush(image);
 
-        // Fetch so the image's id can be returned
-        image = imageRepository.findImageByImageName(storedFileName);
         return image;
     }
 
     @Override
     public ImageDownloadDto download(Long listingId, Long imageId) {
-        Listing listing = getListingOrElseThrow(listingId);
+        List<Image> images = imageRepository.findAll();
 
-        Image image = listing.getImages()
+        Image image = images
                 .stream()
                 .filter(i -> i.getId().equals(imageId))
+                .filter(i -> i.getListingId().equals(listingId))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("No image with id " + imageId + " was found."));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No image with id " + imageId + " and listingId " + listingId + " was found."));
 
         Path path = Path.of(image.getFilePath());
 
@@ -129,25 +125,18 @@ public class ImageServiceImpl implements ImageService  {
 
     @Override
     public void delete(Long listingId, Long imageId) {
-        Listing listing = getListingOrElseThrow(listingId);
+        List<Image> images = imageRepository.findAll();
 
-        Image image = listing.getImages()
+        Image image = images
                 .stream()
                 .filter(i -> i.getId().equals(imageId))
+                .filter(i -> i.getListingId().equals(listingId))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("No image with id " + imageId + " was found."));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No image with id " + imageId + " and listingId " + listingId + " was found."));
 
         deleteFile(image.getFilePath());
-        listing.getImages().remove(image);
-        listingService.update(listing);
-    }
-
-    private Listing getListingOrElseThrow(Long listingId) {
-        Listing listing = listingService.findById(listingId);
-        if (listing == null) {
-            throw new ResourceNotFoundException("No listing with id " + listingId + " was found.");
-        }
-        return listing;
+        imageRepository.deleteById(imageId);
     }
 
     private void validateImage(MultipartFile file) {

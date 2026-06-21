@@ -55,6 +55,9 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.6.3'
     // https://mvnrepository.com/artifact/org.mapstruct/mapstruct-processor
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
+    // OpenFeign for API client - communication with other services
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:5.0.2")
 }
 
 tasks.named('test') {

@@ -1,4 +1,4 @@
-package edu.bbte.replate.utils;
+package edu.bbte.replate.image.utils;
 
 import lombok.Getter;
 import org.springframework.stereotype.Component;
@@ -12,11 +12,11 @@ import java.util.Base64;
 
 @Component
 @Getter
-public class JwtKeyProvider {
+public class JwtKeyProviderPublicOnly {
     // Only public key for services that validate tokens, not produce them
     private final PublicKey publicKey;
 
-    public JwtKeyProvider() throws Exception {
+    public JwtKeyProviderPublicOnly() throws Exception {
         this.publicKey = loadPublicKey();
     }
 

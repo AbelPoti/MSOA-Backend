@@ -17,4 +17,6 @@ public interface ListingService {
     void update(Listing listing);
 
     void delete(Long id);
+
+    boolean isOwner(Long listingId, Long userId);
 }

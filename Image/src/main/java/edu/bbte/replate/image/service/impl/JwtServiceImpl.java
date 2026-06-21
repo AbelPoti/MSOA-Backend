@@ -1,7 +1,7 @@
-package edu.bbte.replate.service.impl;
+package edu.bbte.replate.image.service.impl;
 
-import edu.bbte.replate.service.JwtService;
-import edu.bbte.replate.utils.JwtKeyProviderPublicOnly;
+import edu.bbte.replate.image.service.JwtService;
+import edu.bbte.replate.image.utils.JwtKeyProviderPublicOnly;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

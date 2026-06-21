@@ -1,4 +1,4 @@
-package edu.bbte.replate.utils;
+package edu.bbte.replate.image.utils;
 
 public record JwtPrincipal(
         Long userId,

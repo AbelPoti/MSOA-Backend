@@ -1,7 +1,7 @@
-package edu.bbte.replate.filter;
+package edu.bbte.replate.image.filter;
 
-import edu.bbte.replate.service.JwtService;
-import edu.bbte.replate.utils.JwtPrincipal;
+import edu.bbte.replate.image.service.JwtService;
+import edu.bbte.replate.image.utils.JwtPrincipal;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
