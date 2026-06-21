@@ -91,6 +91,9 @@ public class ImageServiceImpl implements ImageService  {
 
         listing.getImages().add(image);
         listingService.update(listing);
+
+        // Fetch so the image's id can be returned
+        image = imageRepository.findImageByImageName(storedFileName);
         return image;
     }
 
