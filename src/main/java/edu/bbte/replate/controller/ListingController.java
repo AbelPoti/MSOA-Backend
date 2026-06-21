@@ -135,7 +135,7 @@ public class    ListingController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("@listingSecurity.isOwner(#id)")
+    @PreAuthorize("@listingSecurity.isOwner(#id, authentication)")
     public ResponseEntity<SimpleMessageResponseDto> handlePut(
             @PathVariable long id,
             @RequestBody @Valid ListingUpdateDto dto,
@@ -169,7 +169,7 @@ public class    ListingController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@listingSecurity.isOwner(#id)")
+    @PreAuthorize("@listingSecurity.isOwner(#id, authentication)")
     public ResponseEntity<SimpleMessageResponseDto> handleDelete(@PathVariable long id) {
         log.info("Handling DELETE /listings/{} request.", id);
 

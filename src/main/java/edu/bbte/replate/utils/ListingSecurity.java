@@ -14,9 +14,7 @@ public class ListingSecurity {
     @Autowired
     private ListingService listingService;
 
-    public boolean isOwner(Long listingId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
+    public boolean isOwner(Long listingId, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return false;
         }

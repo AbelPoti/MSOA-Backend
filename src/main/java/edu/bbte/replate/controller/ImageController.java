@@ -32,7 +32,7 @@ public class ImageController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("@listingSecurity.isOwner(#listingId)")
+    @PreAuthorize("@listingSecurity.isOwner(#listingId, authentication)")
     public ResponseEntity<SimpleMessageResponseDto> handleUploadImage(
             @PathVariable long listingId,
             @RequestPart("file")MultipartFile file
@@ -94,7 +94,7 @@ public class ImageController {
 
     @DeleteMapping("/{imageId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@listingSecurity.isOwner(#listingId)")
+    @PreAuthorize("@listingSecurity.isOwner(#listingId, authentication)")
     public ResponseEntity<SimpleMessageResponseDto> handleDeleteImageOfListingById(
             @PathVariable long listingId,
             @PathVariable long imageId
