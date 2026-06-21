@@ -1,0 +1,17 @@
+FROM gradle:8.14-jdk21 AS builder
+
+WORKDIR /workspace
+
+COPY . .
+
+RUN ./gradlew :Auth:bootJar --no-daemon
+
+FROM eclipse-temurin:21-jre
+
+WORKDIR /app
+
+COPY --from=builder \
+    /workspace/Auth/build/libs/*.jar \
+    app.jar
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

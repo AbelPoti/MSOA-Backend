@@ -1,4 +1,4 @@
-INSERT IGNORE INTO `city` (`id`, `name`, `county_id`)
+INSERT INTO `city` (`id`, `name`, `county_id`)
 VALUES (1, 'Abrud', 1),
        (2, 'Aiud', 1),
        (3, 'Alba Iulia', 1),

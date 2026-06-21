@@ -1,0 +1,85 @@
+version: "3.9"
+
+services:
+
+  auth-db:
+    image: mysql:8.4
+    container_name: auth-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: replate_auth
+    ports:
+      - "3307:3306"
+    volumes:
+      - auth_db_data:/var/lib/mysql
+
+  core-db:
+    image: mysql:8.4
+    container_name: core-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: replate_core
+    ports:
+      - "3308:3306"
+    volumes:
+      - core_db_data:/var/lib/mysql
+
+  image-db:
+    image: mysql:8.4
+    container_name: image-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: replate_image
+    ports:
+      - "3309:3306"
+    volumes:
+      - image_db_data:/var/lib/mysql
+
+  auth:
+    build:
+      context: .
+      dockerfile: Dockerfile.auth
+    container_name: auth
+    depends_on:
+      - auth-db
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      REPLATE_DATASOURCE_PASSWORD: root
+
+  core:
+    build:
+      context: .
+      dockerfile: Dockerfile.core
+    container_name: core
+    depends_on:
+      - core-db
+      - auth
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      REPLATE_DATASOURCE_PASSWORD: root
+
+  image:
+    build:
+      context: .
+      dockerfile: Dockerfile.image
+    container_name: image
+    depends_on:
+      - image-db
+      - core
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      REPLATE_DATASOURCE_PASSWORD: root
+
+volumes:
+  auth_db_data:
+  core_db_data:
+  image_db_data:

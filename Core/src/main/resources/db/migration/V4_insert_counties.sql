@@ -1,4 +1,4 @@
-INSERT IGNORE INTO `county` (`id`, `name`, `country_id`)
+INSERT INTO `county` (`id`, `name`, `country_id`)
 VALUES (1, 'Alba', 1),
        (2, 'Arad', 1),
        (3, 'Arges', 1),

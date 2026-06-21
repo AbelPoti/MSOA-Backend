@@ -1,4 +1,4 @@
-INSERT IGNORE INTO `category` (`id`, `name`, `parent_category_id`) VALUES
+INSERT INTO `category` (`id`, `name`, `parent_category_id`) VALUES
 -- LEVEL 1 (Main Categories)
 (1, 'Electronics', NULL),
 (2, 'Vehicles', NULL),

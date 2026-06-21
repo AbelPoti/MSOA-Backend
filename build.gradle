@@ -4,30 +4,13 @@ plugins {
 
 apply from: './lint.gradle'
 
-group = 'edu.bbte'
-version = '0.0.1-SNAPSHOT'
-description = 'RePlate'
+allprojects {
+    group = 'edu.bbte'
+    version = '0.0.1-SNAPSHOT'
+    description = 'RePlate'
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+    repositories {
+        mavenCentral()
     }
-}
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
 }
 

@@ -1,3 +1,3 @@
-INSERT IGNORE INTO `country` (`id`, `name`)
+INSERT INTO `country` (`id`, `name`)
 VALUES (1, 'Romania'),
        (2, 'Hungary');

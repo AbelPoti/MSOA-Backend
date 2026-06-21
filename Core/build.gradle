@@ -55,6 +55,9 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.6.3'
     // https://mvnrepository.com/artifact/org.mapstruct/mapstruct-processor
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
+    // Flyway for creating migrations - insert category, location etc. data on startup
+    implementation 'org.flywaydb:flyway-mysql'
 }
 
 tasks.named('test') {

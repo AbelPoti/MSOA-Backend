@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
         name="listing-service",
-        url="${services.listing.url}",
+        url="${core.service.uri}",
         configuration = FeignJwtConfiguration.class
 )
 public interface ListingClient {

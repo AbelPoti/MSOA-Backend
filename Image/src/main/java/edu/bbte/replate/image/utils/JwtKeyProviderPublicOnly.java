@@ -1,10 +1,11 @@
 package edu.bbte.replate.image.utils;
 
 import lombok.Getter;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
 
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
@@ -21,11 +22,12 @@ public class JwtKeyProviderPublicOnly {
     }
 
     private PublicKey loadPublicKey() throws Exception {
+        Resource resource =
+                new ClassPathResource("keys/public.pem");
 
-        String key = Files.readString(
-                ResourceUtils.getFile(
-                        "classpath:keys/public.pem"
-                ).toPath()
+        String key = new String(
+                resource.getInputStream().readAllBytes(),
+                StandardCharsets.UTF_8
         );
 
         key = key
