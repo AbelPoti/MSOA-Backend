@@ -3,10 +3,9 @@ kind: Service
 metadata:
   name: {{ .Chart.Name }}-db
 spec:
+  clusterIP: None
   selector:
     app: {{ .Chart.Name }}-db
   ports:
-    - name: mysql
-      port: {{ .Values.database.port }}
-      targetPort: {{ .Values.database.port }}
-  type: ClusterIP
+  - port: {{ .Values.database.port }}
+    targetPort: {{ .Values.database.port }}
