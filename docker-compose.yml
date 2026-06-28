@@ -7,7 +7,7 @@ services:
     container_name: auth-db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${REPLATE_LOCAL_ROOT_PASSWORD}
       MYSQL_DATABASE: replate_auth
     ports:
       - "3307:3306"
@@ -19,7 +19,7 @@ services:
     container_name: core-db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${REPLATE_LOCAL_ROOT_PASSWORD}
       MYSQL_DATABASE: replate_core
     ports:
       - "3308:3306"
@@ -31,7 +31,7 @@ services:
     container_name: image-db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${REPLATE_LOCAL_ROOT_PASSWORD}
       MYSQL_DATABASE: replate_image
     ports:
       - "3309:3306"
@@ -49,7 +49,7 @@ services:
       - "8081:8081"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      REPLATE_DATASOURCE_PASSWORD: root
+      REPLATE_DATASOURCE_PASSWORD: ${REPLATE_LOCAL_ROOT_PASSWORD}
 
   core:
     build:
@@ -63,7 +63,7 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      REPLATE_DATASOURCE_PASSWORD: root
+      REPLATE_DATASOURCE_PASSWORD: ${REPLATE_LOCAL_ROOT_PASSWORD}
 
   image:
     build:
@@ -77,7 +77,7 @@ services:
       - "8082:8082"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      REPLATE_DATASOURCE_PASSWORD: root
+      REPLATE_DATASOURCE_PASSWORD: ${REPLATE_LOCAL_ROOT_PASSWORD}
 
 volumes:
   auth_db_data:

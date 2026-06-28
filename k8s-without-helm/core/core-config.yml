@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: core-config
+data:
+  SPRING_PROFILES_ACTIVE: "docker"
+  MYSQL_DATABASE: "replate_core"

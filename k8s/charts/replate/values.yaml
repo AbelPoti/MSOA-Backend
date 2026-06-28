@@ -1,0 +1,53 @@
+auth:
+  replicaCount: 1
+
+  service:
+    port: 8081
+
+  database:
+    image: mysql:8.4
+    port: 3306
+    storage: 5Gi
+
+  config:
+    springProfile: docker
+    databaseName: replate_auth
+
+core:
+  replicaCount: 2
+
+  service:
+    port: 8080
+
+  database:
+    image: mysql:8.4
+    port: 3306
+    storage: 5Gi
+
+  config:
+    springProfile: docker
+    databaseName: replate_core
+
+image:
+  replicaCount: 1
+
+  service:
+    port: 8082
+
+  database:
+    image: mysql:8.4
+    port: 3306
+    storage: 5Gi
+
+  config:
+    springProfile: docker
+    databaseName: replate_image
+
+ingress-nginx:
+  enabled: true
+  controller:
+    service:
+      type: LoadBalancer
+
+sealed-secrets:
+  secretName: sealed-secrets-key

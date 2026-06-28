@@ -23,7 +23,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/listings/{listingId}/images")
+@RequestMapping("/images/listings/{listingId}/images")
 @Slf4j
 public class ImageController {
     @Autowired

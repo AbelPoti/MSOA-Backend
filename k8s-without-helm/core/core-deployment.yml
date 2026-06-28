@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: core
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: core
+
+  template:
+    metadata:
+      labels:
+        app: core
+
+    spec:
+      containers:
+        - name: core
+          image: replate-core:latest
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: core-config
+                  key: SPRING_PROFILES_ACTIVE
+            - name: REPLATE_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: core-secret
+                  key: REPLATE_DATASOURCE_PASSWORD
+
+            - name: REPLATE_DATASOURCE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: core-secret
+                  key: REPLATE_DATASOURCE_USER
+
+          ports:
+            - containerPort: 8080

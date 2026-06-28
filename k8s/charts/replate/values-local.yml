@@ -1,0 +1,17 @@
+auth:
+  image:
+    repository: replate-auth
+    tag: latest
+    pullPolicy: IfNotPresent
+
+core:
+  image:
+    repository: replate-core
+    tag: latest
+    pullPolicy: IfNotPresent
+
+image:
+  image:
+    repository: replate-image
+    tag: latest
+    pullPolicy: IfNotPresent

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: auth
+
+  template:
+    metadata:
+      labels:
+        app: auth
+
+    spec:
+      containers:
+        - name: auth
+          image: replate-auth:latest
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: auth-config
+                  key: SPRING_PROFILES_ACTIVE
+            - name: REPLATE_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secret
+                  key: REPLATE_DATASOURCE_PASSWORD
+
+            - name: REPLATE_DATASOURCE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secret
+                  key: REPLATE_DATASOURCE_USER
+
+          ports:
+            - containerPort: 8081
