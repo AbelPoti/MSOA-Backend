@@ -54,7 +54,7 @@ jobs:
         run: |
           echo "Running what-if..."
           az deployment group what-if \
-            --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
             --name "whatif-${{ github.run_id }}" \
             --template-file "${BICEP_FILE_PATH}" \
             --parameters \
