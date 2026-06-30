@@ -1,17 +1,17 @@
 auth:
   image:
-    repository: myacr.azurecr.io/replate-auth
+    repository: msoaacr.azurecr.io/test/replate-auth
     tag: latest
     pullPolicy: IfNotPresent
 
 core:
   image:
-    repository: myacr.azurecr.io/replate-core
+    repository: msoaacr.azurecr.io/test/replate-core
     tag: latest
     pullPolicy: IfNotPresent
 
 image:
   image:
-    repository: myacr.azurecr.io/replate-image
+    repository: msoaacr.azurecr.io/test/replate-image
     tag: latest
     pullPolicy: IfNotPresent

@@ -63,6 +63,7 @@ module roles 'roles.bicep' = {
     uamiPrincipalId: identity.outputs.uamiPrincipalId
     keyVaultName: keyVault.outputs.keyVaultName
     acrName: acr.outputs.acrName
+    aksName: aks.outputs.aksName
     storageAccountName: storage.outputs.storageAccountName
   }
 }

@@ -37,3 +37,5 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-10-01' = {
     }
   }
 }
+
+output aksName string = aks.name

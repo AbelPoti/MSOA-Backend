@@ -3,6 +3,7 @@ param acrName string
 param storageAccountName string
 param uamiId string
 param uamiPrincipalId string
+param aksName string
 
 var kvSecretsUserRoleId = '4633458b-17de-408a-b874-0445c86b69e6'
 var acrPullRoleId = '7f951dda-4ed3-4680-a7ca-43fe172d538d'
@@ -16,6 +17,10 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
 
 resource acr 'Microsoft.ContainerRegistry/registries@2024-11-01-preview' existing = {
   name: acrName
+}
+
+resource aks 'Microsoft.ContainerService/managedClusters@2024-10-01' existing = {
+  name: aksName
 }
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
@@ -36,10 +41,10 @@ resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04
 // Assign the AcrPull role to the user-assigned managed identity for the ACR
 // This will allow the AKS cluster to pull images from the ACR using the managed identity
 resource acrPullRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(acr.id, uamiId, 'AcrPull')
+  name: guid(acr.id, 'AcrPull')
   scope: acr
   properties: {
-    principalId: uamiPrincipalId
+    principalId: aks.properties.identityProfile.kubeletidentity.objectId
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', acrPullRoleId)
     principalType: 'ServicePrincipal'
   }
