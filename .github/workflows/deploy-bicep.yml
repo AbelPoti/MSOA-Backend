@@ -15,7 +15,6 @@ permissions:
 
 env:
   BICEP_FILE_PATH: infra/main.bicep
-  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
 jobs:
   build_bicep:
@@ -26,14 +25,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Azure CLI
+      - name: Build bicep
         uses: azure/CLI@v2
-
-      - name: Build Bicep
-        run: |
-          echo "Starting bicep file build..."
-          az bicep build --file "${BICEP_FILE_PATH}"
-          echo "Bicep file built successfully."
+        with:
+          inlineScript: |
+            echo "Starting bicep file build..."
+            az bicep build --file "${BICEP_FILE_PATH}"
+            echo "Bicep file built successfully."          
 
   whatif_bicep:
     name: What-If Preview
