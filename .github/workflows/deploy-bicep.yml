@@ -73,8 +73,6 @@ jobs:
     needs: whatif_bicep
     if: github.ref == 'refs/heads/main'
 
-    environment: production
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
