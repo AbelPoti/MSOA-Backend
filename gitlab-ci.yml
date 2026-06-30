@@ -1,0 +1,59 @@
+stages:
+  - build
+  - preview
+  - deploy
+
+variables:
+  BICEP_FILE_PATH: 'infra/main.bicep'
+
+.default_azure_cli:
+  image: mcr.microsoft.com/azure-cli:2.63.0
+  id_tokens:
+    AZURE_OIDC_TOKEN:
+      aud: "api://AzureADTokenExchange"
+  before_script:
+    - az version
+    - echo "Logging in into Azure..."
+    - az login --service-principal -u "${AZURE_APP_ID}" --tenant "${AZURE_TENANT_ID}" --federated-token "$(cat azure_federated_token.jwt)"
+    - rm azure_federated_token.jwt
+    - echo "Successfully logged in into Azure."
+
+build_bicep:
+  stage: build
+  image: mcr.microsoft.com/azure-cli:latest
+  script:
+    - echo "Starting bicep file build..."
+    - az bicep build --file "${BICEP_FILE_PATH}"
+    - echo "Bicep file built successfully."
+  rules:
+    - if: '$CI_PIPELINE_SOURCE' == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+whatif_bicep:
+  stage: preview
+  extends: .default_azure_cli
+  script:
+    - echo "Running what-if..."
+    - az account set --subscription "${AZURE_SUBSCRIPTION_ID}"
+    - az deployment group what-if
+        --resource-group "${AZURE_RESOURCE_GROUP}"
+        --name "whatif-${CI_MERGE_REQUEST_IID:-$CI_PIPELINE_ID}"
+        --template-file "${BICEP_FILE_PATH}"
+        --parameters uamiName=msoauami storageAccountName=msoastga keyVaultName=msoakv aksName=msoaaks acrName=msoaacr
+        -- result-format FullResourcePayloads
+    - echo "Successfully created preview for resources to deploy."
+  rules:
+    - if: '$CI_PIPELINE_SOURCE' == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+deploy_bicep:
+  stage: deploy
+  extends: .default_azure_cli
+  script:
+    - echo "Starting bicep deployment"
+    - az account set --subscription "${AZURE_RESOURCE_GROUP}"
+    - az deployment group create
+      --resource-group "${AZURE_SUBSCRIPTION_ID}"
+      --name "whatif-${CI_MERGE_REQUEST_IID:-$CI_PIPELINE_ID}"
+      --template-file "${BICEP_FILE_PATH}"
+      --parameters uamiName=msoauami storageAccountName=msoastga keyVaultName=msoakv aksName=msoaaks acrName=msoaacr
